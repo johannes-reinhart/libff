@@ -102,9 +102,56 @@ bool bigint<n>::operator<(const bigint<n>& other) const
 }
 
 template<mp_size_t n>
+bool bigint<n>::operator<=(const bigint<n>& other) const
+{
+    return (mpn_cmp(this->data, other.data, n) <= 0);
+}
+
+template<mp_size_t n>
+bool bigint<n>::operator>(const bigint<n>& other) const
+{
+    return (mpn_cmp(this->data, other.data, n) > 0);
+}
+
+template<mp_size_t n>
+bool bigint<n>::operator>=(const bigint<n>& other) const
+{
+    return (mpn_cmp(this->data, other.data, n) >= 0);
+}
+
+template<mp_size_t n>
 void bigint<n>::clear()
 {
     mpn_zero(this->data, n);
+}
+
+template<mp_size_t n>
+bigint<n> bigint<n>::operator<<=(unsigned int shift) {
+    mpn_lshift(this->data, this->data, n, shift); // according to mpn docu, result and input data may overlap
+    return *this;
+}
+
+template<mp_size_t n>
+bigint<n> bigint<n>::operator>>=(unsigned int shift) {
+    mpn_rshift(this->data, this->data, n, shift); // according to mpn docu, result and input data may overlap
+    return *this;
+}
+
+template<mp_size_t n>
+bigint<n> bigint<n>::operator%(bigint<n> m) const {
+    bigint<n> result;
+    bigint<n> dummy;
+    int l = n-1;
+    // When replacing with own GMP implementation: Here, we actually only need the remainder, not the quotient
+    // low level mpn_tdiv_qr requires most siginificant limb of divisor to not be zero
+    while(l > 0) {
+        if (m.data[l] != 0) {
+            break;
+        }
+        l--;
+    }
+    mpn_tdiv_qr (dummy.data, result.data, 0, this->data, n, m.data, l+1);
+    return result;
 }
 
 template<mp_size_t n>

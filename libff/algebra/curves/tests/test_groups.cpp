@@ -4,20 +4,44 @@
  *             and contributors (see AUTHORS).
  * @copyright  MIT license (see LICENSE file)
  *****************************************************************************/
+#include <iostream>
+#include <typeinfo>
+
 #include <gtest/gtest.h>
 
-#include <libff/algebra/curves/edwards/edwards_pp.hpp>
-#include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
 #include <libff/common/profiling.hpp>
 #include <libff/common/utils.hpp>
+
+#include <libff/algebra/curves/edwards/edwards_pp.hpp>
+#include <libff/algebra/curves/edwards58/edwards58_pp.hpp>
+#include <libff/algebra/curves/edwards61/edwards61_pp.hpp>
+#include <libff/algebra/curves/edwards97/edwards97_pp.hpp>
+#include <libff/algebra/curves/edwards181/edwards181_pp.hpp>
+
+#include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
+#include <libff/algebra/curves/bn124/bn124_pp.hpp>
+#include <libff/algebra/curves/bn183/bn183_pp.hpp>
+#include <libff/algebra/curves/bn254/bn254_pp.hpp>
+
+#include <libff/algebra/curves/bls12_381/bls12_381_pp.hpp>
+#include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+
+#include <libff/algebra/curves/baby_jubjub/baby_jubjub_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn124/jubjub_bn124_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn183/jubjub_bn183_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn254/jubjub_bn254_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed58/jubjub_ed58_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed61/jubjub_ed61_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed97/jubjub_ed97_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed181/jubjub_ed181_pp.hpp>
+
+
 #ifdef CURVE_BN128
 #include <libff/algebra/curves/bn128/bn128_pp.hpp>
 #endif
 #include <sstream>
 
-#include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
-#include <libff/algebra/curves/bls12_381/bls12_381_pp.hpp>
 
 using namespace libff;
 
@@ -28,10 +52,30 @@ public:
     CurveGroupsTest()
     {
         edwards_pp::init_public_params();
+        edwards58_pp::init_public_params();
+        edwards61_pp::init_public_params();
+        edwards97_pp::init_public_params();
+        edwards181_pp::init_public_params();
+
         mnt4_pp::init_public_params();
         mnt6_pp::init_public_params();
+
         alt_bn128_pp::init_public_params();
+        bn124_pp::init_public_params();
+        bn183_pp::init_public_params();
+        bn254_pp::init_public_params();
+
         bls12_381_pp::init_public_params();
+
+        baby_jubjub_pp::init_public_params();
+        jubjub_bn124_pp::init_public_params();
+        jubjub_bn183_pp::init_public_params();
+        jubjub_bn254_pp::init_public_params();
+        jubjub_ed58_pp::init_public_params();
+        jubjub_ed61_pp::init_public_params();
+        jubjub_ed97_pp::init_public_params();
+        jubjub_ed181_pp::init_public_params();
+
 #ifdef CURVE_BN128 // BN128 has fancy dependencies so it may be disabled
         bn128_pp::init_public_params();
 #endif
@@ -136,7 +180,7 @@ template<typename GroupT>
 void test_mul_by_q()
 {
     GroupT a = GroupT::random_element();
-    EXPECT_EQ(GroupT::field_char() * a, a.mul_by_q());
+    EXPECT_EQ(GroupT::field_char() * a, a.mul_by_q()) << "Type of a: " << typeid(a).name();
 }
 
 template<typename GroupT>
@@ -162,6 +206,18 @@ TEST_F(CurveGroupsTest, GroupTest)
     test_group<G1<edwards_pp> >();
     test_group<G2<edwards_pp> >();
 
+    test_group<G1<edwards58_pp> >();
+    test_group<G2<edwards58_pp> >();
+
+    test_group<G1<edwards61_pp> >();
+    test_group<G2<edwards61_pp> >();
+
+    test_group<G1<edwards97_pp> >();
+    test_group<G2<edwards97_pp> >();
+
+    test_group<G1<edwards181_pp> >();
+    test_group<G2<edwards181_pp> >();
+
     test_group<G1<mnt4_pp> >();
     test_group<G2<mnt4_pp> >();
 
@@ -170,9 +226,24 @@ TEST_F(CurveGroupsTest, GroupTest)
 
     test_group<G1<alt_bn128_pp> >();
     test_group<G2<alt_bn128_pp> >();
+    test_group<G1<bn124_pp> >();
+    test_group<G2<bn124_pp> >();
+    test_group<G1<bn183_pp> >();
+    test_group<G2<bn183_pp> >();
+    test_group<G1<bn254_pp> >();
+    test_group<G2<bn254_pp> >();
 
     test_group<G1<bls12_381_pp> >();
     test_group<G2<bls12_381_pp> >();
+
+    test_group<G1<baby_jubjub_pp> >();
+    test_group<G1<jubjub_bn124_pp> >();
+    test_group<G1<jubjub_bn183_pp> >();
+    test_group<G1<jubjub_bn254_pp> >();
+    test_group<G1<jubjub_ed58_pp> >();
+    test_group<G1<jubjub_ed61_pp> >();
+    test_group<G1<jubjub_ed97_pp> >();
+    test_group<G1<jubjub_ed181_pp> >();
 
 #ifdef CURVE_BN128       // BN128 has fancy dependencies so it may be disabled
     test_group<G1<bn128_pp> >();
@@ -185,6 +256,18 @@ TEST_F(CurveGroupsTest, OutputTest)
     test_output<G1<edwards_pp> >();
     test_output<G2<edwards_pp> >();
 
+    test_output<G1<edwards58_pp> >();
+    test_output<G2<edwards58_pp> >();
+
+    test_output<G1<edwards61_pp> >();
+    test_output<G2<edwards61_pp> >();
+
+    test_output<G1<edwards97_pp> >();
+    test_output<G2<edwards97_pp> >();
+
+    test_output<G1<edwards181_pp> >();
+    test_output<G2<edwards181_pp> >();
+
     test_output<G1<mnt4_pp> >();
     test_output<G2<mnt4_pp> >();
 
@@ -193,9 +276,24 @@ TEST_F(CurveGroupsTest, OutputTest)
 
     test_output<G1<alt_bn128_pp> >();
     test_output<G2<alt_bn128_pp> >();
+    test_output<G1<bn124_pp> >();
+    test_output<G2<bn124_pp> >();
+    test_output<G1<bn183_pp> >();
+    test_output<G2<bn183_pp> >();
+    test_output<G1<bn254_pp> >();
+    test_output<G2<bn254_pp> >();
 
     test_output<G1<bls12_381_pp> >();
     test_output<G2<bls12_381_pp> >();
+
+    test_output<G1<baby_jubjub_pp> >();
+    test_output<G1<jubjub_bn124_pp> >();
+    test_output<G1<jubjub_bn183_pp> >();
+    test_output<G1<jubjub_bn254_pp> >();
+    test_output<G1<jubjub_ed58_pp> >();
+    test_output<G1<jubjub_ed61_pp> >();
+    test_output<G1<jubjub_ed97_pp> >();
+    test_output<G1<jubjub_ed181_pp> >();
 
 #ifdef CURVE_BN128       // BN128 has fancy dependencies so it may be disabled
     test_output<G1<bn128_pp> >();
@@ -206,8 +304,17 @@ TEST_F(CurveGroupsTest, OutputTest)
 TEST_F(CurveGroupsTest, MulByQTest)
 {
     test_mul_by_q<G2<edwards_pp> >();
+    test_mul_by_q<G2<edwards58_pp> >();
+    test_mul_by_q<G2<edwards61_pp> >();
+    test_mul_by_q<G2<edwards97_pp> >();
+    test_mul_by_q<G2<edwards181_pp> >();
+
     test_mul_by_q<G2<mnt4_pp> >();
     test_mul_by_q<G2<mnt6_pp> >();
     test_mul_by_q<G2<alt_bn128_pp> >();
+    test_mul_by_q<G2<bn124_pp> >();
+    test_mul_by_q<G2<bn183_pp> >();
+    test_mul_by_q<G2<bn254_pp> >();
+
     test_mul_by_q<G2<bls12_381_pp> >();
 }

@@ -43,6 +43,13 @@ FieldT power(const FieldT &base, const std::vector<unsigned long long> exponent)
 template<typename FieldT>
 FieldT tonelli_shanks_sqrt(const FieldT &value);
 
+/**
+ * Jacobi Symbol
+ */
+template<typename FieldT>
+int jacobi(const FieldT &value);
+
+
 } // namespace libff
 
 #include <libff/algebra/field_utils/algorithms.tcc>

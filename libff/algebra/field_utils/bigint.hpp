@@ -50,6 +50,19 @@ public:
     bool operator==(const bigint<n>& other) const;
     bool operator!=(const bigint<n>& other) const;
     bool operator<(const bigint<n>& other) const;
+    bool operator<=(const bigint<n>& other) const;
+    bool operator>(const bigint<n>& other) const;
+    bool operator>=(const bigint<n>& other) const;
+
+    // Arithmetic left shift operator
+    bigint<n> operator<<=(const unsigned int shift);
+
+    // Artihmetic right shift operator
+    bigint<n> operator>>=(const unsigned int shift);
+
+    // Modulo operator
+    bigint<n> operator%(bigint<n> m) const;
+
     void clear();
     bool is_zero() const;
     bool is_even() const;

@@ -82,7 +82,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T> &v);
 
 template<typename T>
-std::istream& operator>>(std::ostream& out, std::vector<T> &v);
+std::istream& operator>>(std::istream& in, std::vector<T> &v);
 
 template<typename T1, typename T2>
 std::ostream& operator<<(std::ostream& out, const std::map<T1, T2> &m);

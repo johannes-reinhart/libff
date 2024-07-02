@@ -97,6 +97,13 @@ T reserialize(const T &obj)
 }
 
 template<typename T>
+size_t get_serialized_size(const T& obj){
+    std::stringstream ss;
+    ss << obj;
+    return ss.str().size();
+}
+
+template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T> &v)
 {
     static_assert(!std::is_same<T, bool>::value, "this does not work for std::vector<bool>");

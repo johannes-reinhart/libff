@@ -66,6 +66,10 @@ public:
     Fp_model() {};
     Fp_model(const bigint<n> &b);
     Fp_model(const long x, const bool is_unsigned=false);
+    /*Fp_model(const Fp_model<n, modulus> &f);
+    Fp_model(Fp_model<n, modulus> &&f) = default;
+    Fp_model<n, modulus>& operator=(const Fp_model<n, modulus> &f) = default;
+    Fp_model<n, modulus>& operator=(Fp_model<n, modulus> &&f) = default;*/
 
     void set_ulong(const unsigned long x);
 
@@ -81,6 +85,11 @@ public:
      * Only the right-most ceil_size_in_bits() bits are used; other bits are 0.
      */
     std::vector<uint64_t> to_words() const;
+     /**
+     * Returns the constituent bits in 8 bit octets, in little-endian order.
+     * Only the right-most ceil_size_in_bits() bits are used; other bits are 0.
+     */
+     std::vector<uint8_t> to_bytes() const;
     /**
      * Sets the field element from the given bits in 64 bit words, in little-endian order.
      * Only the right-most ceil_size_in_bits() bits are used; other bits are ignored.
@@ -90,10 +99,21 @@ public:
      */
     bool from_words(std::vector<uint64_t> words);
 
-    /* Return the standard (not Montgomery) representation of the
-       Field element's requivalence class. I.e. Fp(2).as_bigint()
-        would return bigint(2) */
+    void from_bytes(std::vector<uint8_t> bytes, bool bigendian=false);
+
+    /**
+     * Return the standard (not Montgomery) representation of the
+     *  Field element's requivalence class. I.e. Fp(2).as_bigint()
+     *  would return bigint(2)
+     */
     bigint<n> as_bigint() const;
+
+    /**
+     * Return a signed integer representation of
+     *
+     */
+    //bigint<n> as_bigint_signed() const;
+
     /* Return the last limb of the standard representation of the
        field element. E.g. on 64-bit architectures Fp(123).as_ulong()
        and Fp(2^64+123).as_ulong() would both return 123. */
@@ -117,6 +137,13 @@ public:
     template<mp_size_t m>
     Fp_model operator^(const bigint<m> &pow) const;
     Fp_model operator-() const;
+
+    // Warning: This is the other way around than in ethsnarks
+    bool is_negative() const;
+    bool operator>(const Fp_model& other) const;
+    bool operator>=(const Fp_model& other) const;
+    bool operator<(const Fp_model& other) const;
+    bool operator<=(const Fp_model& other) const;
 
     Fp_model& square();
     Fp_model squared() const;

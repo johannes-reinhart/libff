@@ -42,6 +42,7 @@ public:
 
     // using Jacobian coordinates
     alt_bn128_G1();
+    alt_bn128_G1(const alt_bn128_Fq& X, const alt_bn128_Fq& Y) : X(X), Y(Y), Z(1) {};
     alt_bn128_G1(const alt_bn128_Fq& X, const alt_bn128_Fq& Y, const alt_bn128_Fq& Z) : X(X), Y(Y), Z(Z) {};
 
     void print() const;

@@ -246,7 +246,7 @@ struct extended_edwards_G1_projective {
         T.print();
     }
 
-    static void test_invariant()
+    void test_invariant()
     {
         assert(T*Z == X*Y);
     }
@@ -464,7 +464,7 @@ struct extended_edwards_G2_projective {
             T.print();
         }
 
-    static void test_invariant()
+    void test_invariant()
         {
             assert(T*Z == X*Y);
         }
@@ -491,8 +491,8 @@ void doubling_step_for_flipped_miller_loop(extended_edwards_G2_projective &curre
     cc.c_ZZ = cc.c_ZZ + cc.c_ZZ;
 
     // c_XY = 2*(C-edwards_a * A * delta_3-B)+G (edwards_a = 1 for us)
-    cc.c_XY = C - edwards_G2::mul_by_a(A) - B; // edwards_param_twist_coeff_a is 1 * X for us
-    cc.c_XY = cc.c_XY + cc.c_XY + G;
+    // cc.c_XY = C - edwards_G2::mul_by_a(A) - B; // edwards_param_twist_coeff_a is 1 * X for us
+    cc.c_XY = J + J + G;
 
     // c_XZ = 2*(edwards_a*X1*T1*delta_3-B) (edwards_a = 1 for us)
     cc.c_XZ = edwards_G2::mul_by_a(X * T) - B; // edwards_param_twist_coeff_a is 1 * X for us

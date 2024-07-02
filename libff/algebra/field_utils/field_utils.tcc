@@ -256,5 +256,17 @@ void batch_invert(std::vector<FieldT> &vec)
     }
 }
 
+template<typename FieldT>
+bool is_negative(FieldT v){
+    // ethsnarks utils has it the other way around
+    // According to Original Bernstein EdDSA Paper:
+    // "We use the encoding of Fq to define some field elements as being negative: specifically,
+    // x is negative if the (b−1)-bit encoding of x is lexicographically larger than the (b−1)-bit encoding of −x"
+    // -> Depends on endianness (?)
+    // -> Here we compare numbers -> lexicographically big-endian
+    FieldT mv = -v;
+    return mv.as_bigint() < v.as_bigint();
+}
+
 } // namespace libff
 #endif // FIELD_UTILS_TCC_

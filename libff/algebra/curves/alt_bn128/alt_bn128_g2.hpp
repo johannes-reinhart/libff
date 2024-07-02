@@ -43,6 +43,7 @@ public:
 
     // using Jacobian coordinates
     alt_bn128_G2();
+    alt_bn128_G2(const alt_bn128_Fq2& X, const alt_bn128_Fq2& Y) : X(X), Y(Y), Z(alt_bn128_Fq2::one()) {};
     alt_bn128_G2(const alt_bn128_Fq2& X, const alt_bn128_Fq2& Y, const alt_bn128_Fq2& Z) : X(X), Y(Y), Z(Z) {};
 
     static alt_bn128_Fq2 mul_by_b(const alt_bn128_Fq2 &elt);

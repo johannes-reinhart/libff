@@ -13,13 +13,30 @@
 #include <gtest/gtest.h>
 
 #include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
+#include <libff/algebra/curves/bn124/bn124_pp.hpp>
+#include <libff/algebra/curves/bn183/bn183_pp.hpp>
+#include <libff/algebra/curves/bn254/bn254_pp.hpp>
 #include <libff/algebra/curves/bls12_381/bls12_381_pp.hpp>
 #ifdef CURVE_BN128
 #include <libff/algebra/curves/bn128/bn128_pp.hpp>
 #endif
 #include <libff/algebra/curves/edwards/edwards_pp.hpp>
+#include <libff/algebra/curves/edwards58/edwards58_pp.hpp>
+#include <libff/algebra/curves/edwards61/edwards61_pp.hpp>
+#include <libff/algebra/curves/edwards97/edwards97_pp.hpp>
+#include <libff/algebra/curves/edwards181/edwards181_pp.hpp>
 #include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+
+#include <libff/algebra/curves/baby_jubjub/baby_jubjub_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn124/jubjub_bn124_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn183/jubjub_bn183_pp.hpp>
+#include <libff/algebra/curves/jubjub_bn254/jubjub_bn254_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed58/jubjub_ed58_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed61/jubjub_ed61_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed97/jubjub_ed97_pp.hpp>
+#include <libff/algebra/curves/jubjub_ed181/jubjub_ed181_pp.hpp>
+
 #include <libff/common/profiling.hpp>
 #include <libff/common/utils.hpp>
 
@@ -30,10 +47,27 @@ public:
     FpnFieldsTest()
     {
         init_edwards_fields();
+        init_edwards58_fields();
+        init_edwards61_fields();
+        init_edwards97_fields();
+        init_edwards181_fields();
         init_mnt4_fields();
         init_mnt6_fields();
         init_alt_bn128_fields();
+        init_bn124_fields();
+        init_bn183_fields();
+        init_bn254_fields();
         init_bls12_381_fields();
+
+        init_baby_jubjub_fields();
+        init_jubjub_bn124_fields();
+        init_jubjub_bn183_fields();
+        init_jubjub_bn254_fields();
+        init_jubjub_ed58_fields();
+        init_jubjub_ed61_fields();
+        init_jubjub_ed97_fields();
+        init_jubjub_ed181_fields();
+
 #ifdef CURVE_BN128 // BN128 has fancy dependencies so it may be disabled.
         init_bn128_fields();
 #endif
@@ -249,6 +283,10 @@ void test_Fp4_toom_cook()
 TEST_F(FpnFieldsTest, GeneralTest)
 {
     test_all_fields<edwards_pp>();
+    test_all_fields<edwards58_pp>();
+    test_all_fields<edwards61_pp>();
+    test_all_fields<edwards97_pp>();
+    test_all_fields<edwards181_pp>();
 
     test_all_fields<mnt4_pp>();
 
@@ -257,8 +295,37 @@ TEST_F(FpnFieldsTest, GeneralTest)
     test_all_fields<alt_bn128_pp>();
     test_field<alt_bn128_Fq6>(); // alt_bn128_Fq6 is not included in test_all_fields().
 
+    test_all_fields<bn124_pp>();
+    test_field<bn124_Fq6>();
+
+    test_all_fields<bn183_pp>();
+    test_field<bn183_Fq6>();
+
+    test_all_fields<bn254_pp>();
+    test_field<bn254_Fq6>();
+
     test_all_fields<bls12_381_pp>();
     test_field<bls12_381_Fq6>(); // bls12_381_Fq6 is not included in test_all_fields().
+
+    test_field<Fr<baby_jubjub_pp>>();
+    test_field<Fq<baby_jubjub_pp>>();
+
+    test_field<Fr<jubjub_bn124_pp>>();
+    test_field<Fq<jubjub_bn124_pp>>();
+    test_field<Fr<jubjub_bn183_pp>>();
+    test_field<Fq<jubjub_bn183_pp>>();
+    test_field<Fr<jubjub_bn254_pp>>();
+    test_field<Fq<jubjub_bn254_pp>>();
+    test_field<Fr<jubjub_ed58_pp>>();
+    test_field<Fq<jubjub_ed58_pp>>();
+    test_field<Fr<jubjub_ed61_pp>>();
+    test_field<Fq<jubjub_ed61_pp>>();
+    test_field<Fr<jubjub_ed97_pp>>();
+    test_field<Fq<jubjub_ed97_pp>>();
+    test_field<Fr<jubjub_ed181_pp>>();
+    test_field<Fq<jubjub_ed181_pp>>();
+
+
 #ifdef CURVE_BN128       // BN128 has fancy dependencies so it may be disabled.
     test_field<Fr<bn128_pp> >();
     test_field<Fq<bn128_pp> >();

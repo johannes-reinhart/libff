@@ -221,6 +221,12 @@ Fp_model<n,modulus>::Fp_model(const long x, const bool is_unsigned)
     mul_reduce(Rsquared);
 }
 
+/*
+template<mp_size_t n, const bigint<n>& modulus>
+Fp_model<n,modulus>::Fp_model(const Fp_model<n, modulus> &f){
+    mont_repr = f.mont_repr;
+}
+*/
 template<mp_size_t n, const bigint<n>& modulus>
 void Fp_model<n,modulus>::set_ulong(const unsigned long x)
 {
@@ -268,6 +274,8 @@ bool Fp_model<n,modulus>::operator!=(const Fp_model& other) const
 {
     return (this->mont_repr != other.mont_repr);
 }
+
+
 
 template<mp_size_t n, const bigint<n>& modulus>
 bool Fp_model<n,modulus>::is_zero() const
@@ -721,6 +729,42 @@ Fp_model<n,modulus>& Fp_model<n,modulus>::invert()
     return *this;
 }
 
+/**
+ * Returns true, if the value is more than its modulo negative
+ * Warning: This is the other way around than in ethsnarks
+ * But: Fp(2).is_negative() is false, Fp(-2).is_negative() is true
+ */
+template<mp_size_t n, const bigint<n>& modulus>
+bool Fp_model<n,modulus>::is_negative() const
+{
+    Fp_model<n,modulus> negated = -(*this);
+    return this->as_bigint() > negated.as_bigint();
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+bool Fp_model<n,modulus>::operator>(const Fp_model& other) const
+{
+    return (other - *this).is_negative();
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+bool Fp_model<n,modulus>::operator>=(const Fp_model& other) const
+{
+    return *this == other || (other - *this).is_negative();
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+bool Fp_model<n,modulus>::operator<(const Fp_model& other) const
+{
+    return (*this - other).is_negative();
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+bool Fp_model<n,modulus>::operator<=(const Fp_model& other) const
+{
+    return *this == other || (*this - other).is_negative();
+}
+
 template<mp_size_t n, const bigint<n>& modulus>
 Fp_model<n,modulus> Fp_model<n,modulus>::inverse() const
 {
@@ -775,13 +819,54 @@ Fp_model<n,modulus> Fp_model<n,modulus>::sqrt() const
 template<mp_size_t n, const bigint<n>& modulus>
 std::vector<uint64_t> Fp_model<n,modulus>::to_words() const
 {
-    // TODO: implement for other bit architectures
-    static_assert(GMP_NUMB_BITS == 64, "Only 64-bit architectures are currently supported");
+    // TODO: Endianness
+    //static_assert(GMP_NUMB_BITS == 64, "Only 64-bit architectures are currently supported");
 
     bigint<n> repr = this->bigint_repr();
     std::vector<uint64_t> words;
-	words.insert(words.begin(), std::begin(repr.data), std::end(repr.data));
+
+    if (GMP_NUMB_BITS == 64) {
+        words.insert(words.begin(), std::begin(repr.data), std::end(repr.data));
+    } else if (GMP_NUMB_BITS == 32){
+        // TODO: Test this
+        for (size_t i = 0; i < n/2; i++){
+            words.push_back((uint64_t) repr.data[2*i] << 32 | repr.data[2*i+1]);
+        }
+    } else {
+        throw std::logic_error("Only 64-bit and 32-bit architectures are currently supported");
+    }
     return words;
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+std::vector<uint8_t> Fp_model<n,modulus>::to_bytes() const
+{
+    // TODO: Endianness
+    //static_assert(GMP_NUMB_BITS == 64, "Only 64-bit architectures are currently supported");
+
+    bigint<n> repr = this->bigint_repr();
+    std::vector<uint8_t> bytes;
+    bytes.reserve(GMP_NUMB_BITS / 8 * n);
+    for (size_t i = 0; i < n; i++){
+        if (GMP_NUMB_BITS == 64){
+            bytes.push_back((repr.data[i] >> 0) & 0xFF);
+            bytes.push_back((repr.data[i] >> 8) & 0xFF);
+            bytes.push_back((repr.data[i] >> 16) & 0xFF);
+            bytes.push_back((repr.data[i] >> 24) & 0xFF);
+            bytes.push_back((repr.data[i] >> 32) & 0xFF);
+            bytes.push_back((repr.data[i] >> 40) & 0xFF);
+            bytes.push_back((repr.data[i] >> 48) & 0xFF);
+            bytes.push_back((repr.data[i] >> 56) & 0xFF);
+        }else if (GMP_NUMB_BITS == 32){
+            bytes.push_back((repr.data[i] >> 0) & 0xFF);
+            bytes.push_back((repr.data[i] >> 8) & 0xFF);
+            bytes.push_back((repr.data[i] >> 16) & 0xFF);
+            bytes.push_back((repr.data[i] >> 24) & 0xFF);
+        }else{
+            throw std::logic_error("Only 64-bit and 32-bit architectures are currently supported");
+        }
+    }
+    return bytes;
 }
 
 template<mp_size_t n, const bigint<n>& modulus>
@@ -804,6 +889,33 @@ bool Fp_model<n,modulus>::from_words(std::vector<uint64_t> words)
     this->mul_reduce(Rsquared);
 #endif
     return this->mont_repr < modulus;
+}
+
+template<mp_size_t n, const bigint<n>& modulus>
+void Fp_model<n,modulus>::from_bytes(std::vector<uint8_t> bytes, bool bigendian)
+{
+
+#ifdef MONTGOMERY_OUTPUT
+    throw std::logic_error("from bytes for montgomery representation not implemented yet");
+#endif
+
+    for (size_t i = 0; i < n; i++){
+        this->mont_repr.data[i] = 0;
+    }
+
+    const Fp_model<n,modulus> shift(256);
+
+    for (size_t i = 0; i < bytes.size(); i++) {
+        int j;
+        if(bigendian){
+            j = i;
+        }else{
+            j = bytes.size() - i - 1;
+        }
+        *this *=shift;
+        *this += Fp_model<n,modulus>(bytes[j], true);
+        //std::cout << "byte " << std::hex << static_cast<int>(bytes[i]) << " v " << std::dec << *this << std::endl;
+    }
 }
 
 template<mp_size_t n, const bigint<n>& modulus>

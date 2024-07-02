@@ -32,18 +32,113 @@ add_library(
   algebra/curves/bls12_381/bls12_381_init.cpp
   algebra/curves/bls12_381/bls12_381_pairing.cpp
   algebra/curves/bls12_381/bls12_381_pp.cpp
+
   algebra/curves/alt_bn128/alt_bn128_fields.cpp
   algebra/curves/alt_bn128/alt_bn128_g1.cpp
   algebra/curves/alt_bn128/alt_bn128_g2.cpp
   algebra/curves/alt_bn128/alt_bn128_init.cpp
   algebra/curves/alt_bn128/alt_bn128_pairing.cpp
   algebra/curves/alt_bn128/alt_bn128_pp.cpp
+
+  algebra/curves/bn124/bn124_fields.cpp
+  algebra/curves/bn124/bn124_g1.cpp
+  algebra/curves/bn124/bn124_g2.cpp
+  algebra/curves/bn124/bn124_init.cpp
+  algebra/curves/bn124/bn124_pairing.cpp
+  algebra/curves/bn124/bn124_pp.cpp
+
+  algebra/curves/bn183/bn183_fields.cpp
+  algebra/curves/bn183/bn183_g1.cpp
+  algebra/curves/bn183/bn183_g2.cpp
+  algebra/curves/bn183/bn183_init.cpp
+  algebra/curves/bn183/bn183_pairing.cpp
+  algebra/curves/bn183/bn183_pp.cpp
+
+  algebra/curves/bn254/bn254_fields.cpp
+  algebra/curves/bn254/bn254_g1.cpp
+  algebra/curves/bn254/bn254_g2.cpp
+  algebra/curves/bn254/bn254_init.cpp
+  algebra/curves/bn254/bn254_pairing.cpp
+  algebra/curves/bn254/bn254_pp.cpp
+
+  algebra/curves/baby_jubjub/baby_jubjub_fields.cpp
+  algebra/curves/baby_jubjub/baby_jubjub_g1.cpp
+  algebra/curves/baby_jubjub/baby_jubjub_init.cpp
+  algebra/curves/baby_jubjub/baby_jubjub_pp.cpp
+
+  algebra/curves/jubjub_bn124/jubjub_bn124_fields.cpp
+  algebra/curves/jubjub_bn124/jubjub_bn124_g1.cpp
+  algebra/curves/jubjub_bn124/jubjub_bn124_init.cpp
+  algebra/curves/jubjub_bn124/jubjub_bn124_pp.cpp
+
+  algebra/curves/jubjub_bn183/jubjub_bn183_fields.cpp
+  algebra/curves/jubjub_bn183/jubjub_bn183_g1.cpp
+  algebra/curves/jubjub_bn183/jubjub_bn183_init.cpp
+  algebra/curves/jubjub_bn183/jubjub_bn183_pp.cpp
+
+  algebra/curves/jubjub_bn254/jubjub_bn254_fields.cpp
+  algebra/curves/jubjub_bn254/jubjub_bn254_g1.cpp
+  algebra/curves/jubjub_bn254/jubjub_bn254_init.cpp
+  algebra/curves/jubjub_bn254/jubjub_bn254_pp.cpp
+
+  algebra/curves/jubjub_ed58/jubjub_ed58_fields.cpp
+  algebra/curves/jubjub_ed58/jubjub_ed58_g1.cpp
+  algebra/curves/jubjub_ed58/jubjub_ed58_init.cpp
+  algebra/curves/jubjub_ed58/jubjub_ed58_pp.cpp
+
+  algebra/curves/jubjub_ed61/jubjub_ed61_fields.cpp
+  algebra/curves/jubjub_ed61/jubjub_ed61_g1.cpp
+  algebra/curves/jubjub_ed61/jubjub_ed61_init.cpp
+  algebra/curves/jubjub_ed61/jubjub_ed61_pp.cpp
+
+  algebra/curves/jubjub_ed97/jubjub_ed97_fields.cpp
+  algebra/curves/jubjub_ed97/jubjub_ed97_g1.cpp
+  algebra/curves/jubjub_ed97/jubjub_ed97_init.cpp
+  algebra/curves/jubjub_ed97/jubjub_ed97_pp.cpp
+
+  algebra/curves/jubjub_ed181/jubjub_ed181_fields.cpp
+  algebra/curves/jubjub_ed181/jubjub_ed181_g1.cpp
+  algebra/curves/jubjub_ed181/jubjub_ed181_init.cpp
+  algebra/curves/jubjub_ed181/jubjub_ed181_pp.cpp
+
+
+
   algebra/curves/edwards/edwards_fields.cpp
   algebra/curves/edwards/edwards_g1.cpp
   algebra/curves/edwards/edwards_g2.cpp
   algebra/curves/edwards/edwards_init.cpp
   algebra/curves/edwards/edwards_pairing.cpp
   algebra/curves/edwards/edwards_pp.cpp
+
+  algebra/curves/edwards58/edwards58_fields.cpp
+  algebra/curves/edwards58/edwards58_g1.cpp
+  algebra/curves/edwards58/edwards58_g2.cpp
+  algebra/curves/edwards58/edwards58_init.cpp
+  algebra/curves/edwards58/edwards58_pairing.cpp
+  algebra/curves/edwards58/edwards58_pp.cpp
+
+  algebra/curves/edwards61/edwards61_fields.cpp
+  algebra/curves/edwards61/edwards61_g1.cpp
+  algebra/curves/edwards61/edwards61_g2.cpp
+  algebra/curves/edwards61/edwards61_init.cpp
+  algebra/curves/edwards61/edwards61_pairing.cpp
+  algebra/curves/edwards61/edwards61_pp.cpp
+
+  algebra/curves/edwards97/edwards97_fields.cpp
+  algebra/curves/edwards97/edwards97_g1.cpp
+  algebra/curves/edwards97/edwards97_g2.cpp
+  algebra/curves/edwards97/edwards97_init.cpp
+  algebra/curves/edwards97/edwards97_pairing.cpp
+  algebra/curves/edwards97/edwards97_pp.cpp
+
+  algebra/curves/edwards181/edwards181_fields.cpp
+  algebra/curves/edwards181/edwards181_g1.cpp
+  algebra/curves/edwards181/edwards181_g2.cpp
+  algebra/curves/edwards181/edwards181_init.cpp
+  algebra/curves/edwards181/edwards181_pairing.cpp
+  algebra/curves/edwards181/edwards181_pp.cpp
+
+
   algebra/curves/mnt/mnt4/mnt4_fields.cpp
   algebra/curves/mnt/mnt4/mnt4_g1.cpp
   algebra/curves/mnt/mnt4/mnt4_g2.cpp
@@ -71,7 +166,9 @@ add_library(
 target_link_libraries(
   ff
 
-  GMP::gmp
+  ${GMPXX_LIBRARIES}
+  ${GMP_LIBRARIES}
+
   ${PROCPS_LIBRARIES}
   ${FF_EXTRALIBS}
 )
@@ -270,5 +367,31 @@ if ("${IS_LIBFF_PARENT}")
     ff
   )
 
+  add_executable(
+          pairing_profile
+          EXCLUDE_FROM_ALL
+
+          algebra/curves/profiling/pairing_profile.cpp
+  )
+  target_link_libraries(
+          pairing_profile
+
+          ff
+  )
+
+  add_executable(
+          addition_profile
+          EXCLUDE_FROM_ALL
+
+          algebra/curves/profiling/pairing_profile.cpp
+  )
+  target_link_libraries(
+          addition_profile
+
+          ff
+  )
+
   add_dependencies(profile multiexp_profile)
+  add_dependencies(profile pairing_profile)
+  add_dependencies(profile addition_profile)
 endif()

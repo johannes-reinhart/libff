@@ -11,9 +11,13 @@
 #include <cstdio>
 #include <vector>
 
-#include <libff/algebra/curves/bn128/bn128_pp.hpp>
+#include <libff/algebra/curves/bn254/bn254_pp.hpp>
+#include <libff/algebra/curves/bn183/bn183_pp.hpp>
+#include <libff/algebra/curves/bn124/bn124_pp.hpp>
+#include <libff/algebra/curves/edwards181/edwards181_pp.hpp>
+#include <libff/algebra/curves/edwards97/edwards97_pp.hpp>
+#include <libff/algebra/curves/edwards58/edwards58_pp.hpp>
 #include <libff/algebra/scalar_multiplication/multiexp.hpp>
-#include <libff/common/profiling.hpp>
 #include <libff/common/rng.hpp>
 
 using namespace libff;
@@ -35,7 +39,9 @@ test_instances_t<GroupT> generate_group_elements(size_t count, size_t size)
 
     for (size_t i = 0; i < count; i++) {
         GroupT x = GroupT::random_element();
+#ifdef USE_MIXED_ADDITION
         x.to_special(); // djb requires input to be in special form
+#endif
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
             // result[i].push_back(GroupT::random_element());
@@ -81,6 +87,7 @@ run_result_t<GroupT> profile_multiexp(
     return run_result_t<GroupT>(time_delta, answers);
 }
 
+
 template<typename GroupT, typename FieldT>
 void print_performance_csv(
     size_t expn_start,
@@ -125,16 +132,68 @@ void print_performance_csv(
     }
 }
 
+
+template<typename GroupT, typename FieldT>
+void field_print_performance_csv(
+        size_t expn_start,
+        size_t expn_end_fast,
+        size_t expn_end_naive,
+        bool compare_answers)
+{
+    for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
+        printf("%ld", expn); fflush(stdout);
+
+        test_instances_t<GroupT> group_elements =
+                generate_group_elements<GroupT>(10, 1 << expn);
+        test_instances_t<FieldT> scalars =
+                generate_scalars<FieldT>(10, 1 << expn);
+
+        if (expn <= expn_end_naive) {
+            run_result_t<GroupT> result_naive =
+                    profile_multiexp<GroupT, FieldT, multi_exp_method_naive_plain>(
+                            group_elements, scalars);
+            printf("\t%lld", result_naive.first); fflush(stdout);
+
+        }
+
+        printf("\n");
+    }
+}
+
+template<typename pp>
+void profile_groups(){
+    printf("G1\n");
+    pp::init_public_params();
+    print_performance_csv<G1<pp>, Fr<pp> >(2, 12, 12, true);
+
+    printf("G2\n");
+    print_performance_csv<G2<pp>, Fr<pp> >(2, 12, 12, true);
+
+    printf("GT\n");
+    field_print_performance_csv<GT<pp>, Fq<pp> >(2, 12, 12, true);
+}
+
 int main()
 {
     print_compilation_info();
 
-    printf("Profiling BN128_G1\n");
-    bn128_pp::init_public_params();
-    print_performance_csv<G1<bn128_pp>, Fr<bn128_pp> >(2, 20, 14, true);
+    printf("Profiling BN254\n");
+    profile_groups<bn254_pp>();
 
-    printf("Profiling BN128_G2\n");
-    print_performance_csv<G2<bn128_pp>, Fr<bn128_pp> >(2, 20, 14, true);
+    printf("Profiling BN183\n");
+    profile_groups<bn183_pp>();
+
+    printf("Profiling BN124\n");
+    profile_groups<bn124_pp>();
+
+    printf("Profiling EDWARDS181\n");
+    profile_groups<edwards181_pp>();
+
+    printf("Profiling EDWARDS97\n");
+    profile_groups<edwards97_pp>();
+
+    printf("Profiling EDWARDS58\n");
+    profile_groups<edwards58_pp>();
 
     return 0;
 }

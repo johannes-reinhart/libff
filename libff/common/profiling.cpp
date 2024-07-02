@@ -16,7 +16,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include <libff/common/default_types/ec_pp.hpp>
 #include <libff/common/profiling.hpp>
 #include <libff/common/utils.hpp>
 

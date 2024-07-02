@@ -77,7 +77,7 @@ option(
 option(
   USE_ASM
   "Use architecture-specific optimized assembly code"
-  ON
+  OFF
 )
 
 option(
@@ -90,7 +90,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # Common compilation flags and warning configuration
   set(
     CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wfatal-errors"
+    "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wfatal-errors" # Removed -std=c++11
   )
   if("${MULTICORE}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
@@ -99,6 +99,8 @@ endif()
 
 find_path(GMP_INCLUDE_DIR NAMES gmp.h)
 find_library(GMP_LIBRARY gmp)
+find_library(GMP_LIBRARIES NAMES gmp libgmp)
+find_library(GMPXX_LIBRARIES NAMES gmpxx libgmpxx)
 if(GMP_LIBRARY MATCHES ${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(gmp_library_type SHARED)
 else()
@@ -220,7 +222,7 @@ if ("${IS_LIBFF_PARENT}")
   endif()
 
   # Add a `make check` target that builds and tests
-  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} ARGS --output-on-failure)
 
   # Add a `make profile` target that builds and profiles
   add_custom_target(
@@ -229,7 +231,7 @@ if ("${IS_LIBFF_PARENT}")
      -E echo 'Built target finished'
   )
 
-  add_subdirectory(depends)
+  add_subdirectory(depends/gtest)
   # Add a 'make clang-tidy' target that runs clang-tidy using checks specified in .clang-tidy
   include(clang-tidy.cmake)
 endif()
