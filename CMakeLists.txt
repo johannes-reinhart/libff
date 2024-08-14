@@ -8,7 +8,7 @@ endif()
 
 set(
   CURVE
-  "BN128"
+  "BN254"
   CACHE
   STRING
   "Default curve: one of BLS12_381, ALT_BN128, BN128, EDWARDS, MNT4, MNT6"

@@ -25,6 +25,10 @@ endif()
 
 set(FF_BINARY_FIELDS)
 if("${BINARY_FIELDS}")
+  add_definitions(
+          -DBINARY_FIELDS
+  )
+
   set(FF_BINARY_FIELDS
 
      ${FF_BINARY_FIELDS}
@@ -301,6 +305,7 @@ if ("${IS_LIBFF_PARENT}")
     gtest_main
   )
 
+  if("${BINARY_FIELDS}")
   add_executable(
     algebra_binary_fields_test
     EXCLUDE_FROM_ALL
@@ -313,6 +318,7 @@ if ("${IS_LIBFF_PARENT}")
     ff
     gtest_main
   )
+  endif()
 
   add_executable(
     common_test
@@ -348,10 +354,12 @@ if ("${IS_LIBFF_PARENT}")
     NAME algebra_fpn_fields_test
     COMMAND algebra_fpn_fields_test
   )
+  if("${BINARY_FIELDS}")
   add_test(
     NAME algebra_binary_fields_test
     COMMAND algebra_binary_fields_test
   )
+  endif()
   add_test(
     NAME common_test
     COMMAND common_test
@@ -362,7 +370,9 @@ if ("${IS_LIBFF_PARENT}")
   add_dependencies(check algebra_field_utils_test)
   add_dependencies(check algebra_all_fields_test)
   add_dependencies(check algebra_fpn_fields_test)
+  if("${BINARY_FIELDS}")
   add_dependencies(check algebra_binary_fields_test)
+  endif()
   add_dependencies(check common_test)
 
   find_package(OpenSSL REQUIRED)

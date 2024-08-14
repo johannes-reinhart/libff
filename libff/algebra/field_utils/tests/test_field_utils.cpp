@@ -31,7 +31,7 @@ FieldT power_naive(const FieldT &base, const std::size_t exponent)
     return result;
 }
 
-
+#ifdef BINARY_FIELDS
 TEST(ExponentiationTest, SimpleTest) {
     typedef gf64 FieldT;
 
@@ -52,6 +52,7 @@ TEST(ExponentiationTest, SimpleTest) {
         X_i *= X;
     }
 }
+#endif
 
 TEST(FieldUtilsTest, BigintTest)
 {
