@@ -22,6 +22,20 @@ if(${CURVE} STREQUAL "BN128")
   )
 endif()
 
+
+set(FF_BINARY_FIELDS)
+if("${BINARY_FIELDS}")
+  set(FF_BINARY_FIELDS
+
+     ${FF_BINARY_FIELDS}
+      algebra/fields/binary/gf32.cpp
+      algebra/fields/binary/gf64.cpp
+      algebra/fields/binary/gf128.cpp
+      algebra/fields/binary/gf192.cpp
+      algebra/fields/binary/gf256.cpp
+  )
+endif()
+
 add_library(
   ff
   STATIC
@@ -152,11 +166,9 @@ add_library(
   algebra/curves/mnt/mnt6/mnt6_init.cpp
   algebra/curves/mnt/mnt6/mnt6_pairing.cpp
   algebra/curves/mnt/mnt6/mnt6_pp.cpp
-  algebra/fields/binary/gf32.cpp
-  algebra/fields/binary/gf64.cpp
-  algebra/fields/binary/gf128.cpp
-  algebra/fields/binary/gf192.cpp
-  algebra/fields/binary/gf256.cpp
+
+  ${FF_BINARY_FIELDS}
+
   common/double.cpp
   common/profiling.cpp
   common/utils.cpp
@@ -177,6 +189,7 @@ target_include_directories(
   PUBLIC ..
 )
 
+if("${BINARY_FIELDS}")
 # Sodium for binary fields.
  find_path(
    SODIUM_INCLUDE_DIR
@@ -205,6 +218,7 @@ target_include_directories(
    ff
    ${SODIUM_LIBRARY} ${LIBSODIUM_LDFLAGS_OTHER}
  )
+endif()
 
 install(
   DIRECTORY "" DESTINATION "include/libff"

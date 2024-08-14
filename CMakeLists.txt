@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 project (libff)
 # Default to RelWithDebInfo configuration if no configuration is explicitly specified.
@@ -78,6 +78,12 @@ option(
   USE_ASM
   "Use architecture-specific optimized assembly code"
   OFF
+)
+
+option(
+  BINARY_FIELDS
+  "Enable galois fields (requires libsodium)"
+   OFF
 )
 
 option(
