@@ -168,7 +168,6 @@ public:
     friend std::ostream& operator<< <n,modulus>(std::ostream &out, const Fp_model<n, modulus> &p);
     friend std::istream& operator>> <n,modulus>(std::istream &in, Fp_model<n, modulus> &p);
 
-private:
     /** Returns a representation in bigint, depending on the MONTGOMERY_OUTPUT flag. */
     bigint<n> bigint_repr() const;
 };

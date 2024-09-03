@@ -59,7 +59,9 @@ TEST(UtilsTest, RandomElementTest)
 {
     init_edwards_fields();
     test_random_element<edwards_Fq3>();
+#ifdef BINARY_FIELDS
     test_random_element<gf32>();
+#endif
 }
 
 TEST(UtilsTest, CurveVectorSizeTest)

@@ -22,6 +22,24 @@ if(${CURVE} STREQUAL "BN128")
   )
 endif()
 
+
+set(FF_BINARY_FIELDS)
+if("${BINARY_FIELDS}")
+  add_definitions(
+          -DBINARY_FIELDS
+  )
+
+  set(FF_BINARY_FIELDS
+
+     ${FF_BINARY_FIELDS}
+      algebra/fields/binary/gf32.cpp
+      algebra/fields/binary/gf64.cpp
+      algebra/fields/binary/gf128.cpp
+      algebra/fields/binary/gf192.cpp
+      algebra/fields/binary/gf256.cpp
+  )
+endif()
+
 add_library(
   ff
   STATIC
@@ -152,11 +170,9 @@ add_library(
   algebra/curves/mnt/mnt6/mnt6_init.cpp
   algebra/curves/mnt/mnt6/mnt6_pairing.cpp
   algebra/curves/mnt/mnt6/mnt6_pp.cpp
-  algebra/fields/binary/gf32.cpp
-  algebra/fields/binary/gf64.cpp
-  algebra/fields/binary/gf128.cpp
-  algebra/fields/binary/gf192.cpp
-  algebra/fields/binary/gf256.cpp
+
+  ${FF_BINARY_FIELDS}
+
   common/double.cpp
   common/profiling.cpp
   common/utils.cpp
@@ -177,6 +193,7 @@ target_include_directories(
   PUBLIC ..
 )
 
+if("${BINARY_FIELDS}")
 # Sodium for binary fields.
  find_path(
    SODIUM_INCLUDE_DIR
@@ -205,6 +222,7 @@ target_include_directories(
    ff
    ${SODIUM_LIBRARY} ${LIBSODIUM_LDFLAGS_OTHER}
  )
+endif()
 
 install(
   DIRECTORY "" DESTINATION "include/libff"
@@ -288,6 +306,20 @@ if ("${IS_LIBFF_PARENT}")
   )
 
   add_executable(
+          algebra_multiexp_test
+          EXCLUDE_FROM_ALL
+
+          algebra/scalar_multiplication/tests/test_multiexp.cpp
+  )
+  target_link_libraries(
+          algebra_multiexp_test
+
+          ff
+          gtest_main
+  )
+
+  if("${BINARY_FIELDS}")
+  add_executable(
     algebra_binary_fields_test
     EXCLUDE_FROM_ALL
 
@@ -299,6 +331,7 @@ if ("${IS_LIBFF_PARENT}")
     ff
     gtest_main
   )
+  endif()
 
   add_executable(
     common_test
@@ -335,9 +368,15 @@ if ("${IS_LIBFF_PARENT}")
     COMMAND algebra_fpn_fields_test
   )
   add_test(
+          NAME algebra_multiexp_test
+          COMMAND algebra_multiexp_test
+  )
+  if("${BINARY_FIELDS}")
+  add_test(
     NAME algebra_binary_fields_test
     COMMAND algebra_binary_fields_test
   )
+  endif()
   add_test(
     NAME common_test
     COMMAND common_test
@@ -348,7 +387,10 @@ if ("${IS_LIBFF_PARENT}")
   add_dependencies(check algebra_field_utils_test)
   add_dependencies(check algebra_all_fields_test)
   add_dependencies(check algebra_fpn_fields_test)
+  add_dependencies(check algebra_multiexp_test)
+  if("${BINARY_FIELDS}")
   add_dependencies(check algebra_binary_fields_test)
+  endif()
   add_dependencies(check common_test)
 
   find_package(OpenSSL REQUIRED)

@@ -372,11 +372,13 @@ TEST_F(AllFieldsTest, AllFieldsApiTest)
     test_field<AllFieldsTest::Fr3>();
     test_field<AllFieldsTest::Fr6_2_3>();
 
+#ifdef BINARY_FIELDS
     test_field<gf32>();
     test_field<gf64>();
     test_field<gf128>();
     test_field<gf192>();
     test_field<gf256>();
+#endif
 }
 
 #ifdef PROFILE_OP_COUNTS
@@ -414,6 +416,7 @@ TEST_F(AllFieldsTest, FpnFieldsApiTest)
     test_fpn_field<AllFieldsTest::Fr6_2_3>();
 }
 
+#ifdef BINARY_FIELDS
 TEST_F(AllFieldsTest, BinaryFieldsApiTest)
 {
     test_binary_field<gf32>();
@@ -422,3 +425,4 @@ TEST_F(AllFieldsTest, BinaryFieldsApiTest)
     test_binary_field<gf192>();
     test_binary_field<gf256>();
 }
+#endif

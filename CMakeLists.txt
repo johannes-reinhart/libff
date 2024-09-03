@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 project (libff)
 # Default to RelWithDebInfo configuration if no configuration is explicitly specified.
@@ -8,7 +8,7 @@ endif()
 
 set(
   CURVE
-  "BN128"
+  "BN254"
   CACHE
   STRING
   "Default curve: one of BLS12_381, ALT_BN128, BN128, EDWARDS, MNT4, MNT6"
@@ -77,7 +77,13 @@ option(
 option(
   USE_ASM
   "Use architecture-specific optimized assembly code"
-  OFF
+  ON
+)
+
+option(
+  BINARY_FIELDS
+  "Enable galois fields (requires libsodium)"
+   OFF
 )
 
 option(
@@ -95,7 +101,26 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   if("${MULTICORE}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
   endif()
+  # Default optimizations flags (to override, use -DOPT_FLAGS=...)
+  if("${OPT_FLAGS}" STREQUAL "")
+    if("${DEBUG}")
+      set(
+              OPT_FLAGS
+              "-ggdb3 -O0"
+      )
+    else()
+      set(
+              OPT_FLAGS
+              "-O2 -march=native -mtune=native"
+      )
+    endif()
+  endif()
 endif()
+
+set(
+        CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} ${OPT_FLAGS}"
+)
 
 find_path(GMP_INCLUDE_DIR NAMES gmp.h)
 find_library(GMP_LIBRARY gmp)
