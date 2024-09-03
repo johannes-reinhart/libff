@@ -305,6 +305,19 @@ if ("${IS_LIBFF_PARENT}")
     gtest_main
   )
 
+  add_executable(
+          algebra_multiexp_test
+          EXCLUDE_FROM_ALL
+
+          algebra/scalar_multiplication/tests/test_multiexp.cpp
+  )
+  target_link_libraries(
+          algebra_multiexp_test
+
+          ff
+          gtest_main
+  )
+
   if("${BINARY_FIELDS}")
   add_executable(
     algebra_binary_fields_test
@@ -354,6 +367,10 @@ if ("${IS_LIBFF_PARENT}")
     NAME algebra_fpn_fields_test
     COMMAND algebra_fpn_fields_test
   )
+  add_test(
+          NAME algebra_multiexp_test
+          COMMAND algebra_multiexp_test
+  )
   if("${BINARY_FIELDS}")
   add_test(
     NAME algebra_binary_fields_test
@@ -370,6 +387,7 @@ if ("${IS_LIBFF_PARENT}")
   add_dependencies(check algebra_field_utils_test)
   add_dependencies(check algebra_all_fields_test)
   add_dependencies(check algebra_fpn_fields_test)
+  add_dependencies(check algebra_multiexp_test)
   if("${BINARY_FIELDS}")
   add_dependencies(check algebra_binary_fields_test)
   endif()

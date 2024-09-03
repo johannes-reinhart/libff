@@ -77,7 +77,7 @@ option(
 option(
   USE_ASM
   "Use architecture-specific optimized assembly code"
-  OFF
+  ON
 )
 
 option(
@@ -101,7 +101,26 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   if("${MULTICORE}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
   endif()
+  # Default optimizations flags (to override, use -DOPT_FLAGS=...)
+  if("${OPT_FLAGS}" STREQUAL "")
+    if("${DEBUG}")
+      set(
+              OPT_FLAGS
+              "-ggdb3 -O0"
+      )
+    else()
+      set(
+              OPT_FLAGS
+              "-O2 -march=native -mtune=native"
+      )
+    endif()
+  endif()
 endif()
+
+set(
+        CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} ${OPT_FLAGS}"
+)
 
 find_path(GMP_INCLUDE_DIR NAMES gmp.h)
 find_library(GMP_LIBRARY gmp)
