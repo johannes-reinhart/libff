@@ -115,6 +115,15 @@ T random_element_non_zero();
 template<typename T>
 T random_element_exclude(T y);
 
+/**
+ * Converts types between field elements with the same modulus.
+ * This is usually used to convert between the scalar field
+ * of a SNARK curve and the base field of the corresponding inner
+ * curve.
+ */
+template<typename Fp_a, typename Fp_b>
+Fp_b convert_field(Fp_a a);
+
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
 } // namespace libff

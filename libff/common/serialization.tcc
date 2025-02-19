@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <iomanip>
 
 #include <libff/common/utils.hpp>
 
@@ -86,6 +87,55 @@ inline void input_bool_vector(std::istream &in, std::vector<bool> &v)
     }
 }
 
+inline void output_bytes(std::ostream& out, const std::vector<uint8_t> &v)
+{
+#ifdef BINARY_OUTPUT
+    assert(v.size() < 256);
+    auto size = static_cast<uint8_t>(v.size());
+    out.write(reinterpret_cast<const char*>(&size), 1);
+    out.write(reinterpret_cast<const char*>(v.data()), size);
+#else
+    out << std::hex << std::setfill('0');
+    for (const auto& byte : v) {
+        out << std::setw(2) << static_cast<int>(byte);
+    }
+    out << std::dec << std::setfill(' ');  // Reset to defaults after operation
+    out << OUTPUT_SEPARATOR;
+#endif
+}
+
+inline void input_bytes(std::istream& in, std::vector<uint8_t> &v)
+{
+#ifdef BINARY_OUTPUT
+    uint8_t size;
+    in.read(reinterpret_cast<char*>(&size), 1);
+    v.clear();
+    v.insert(v.end(), size, 0);
+    in.read(reinterpret_cast<char*>(v.data()), size);
+#else
+    std::string s;
+    in >> s;
+    libff::consume_OUTPUT_SEPARATOR(in);
+
+    assert(s.length() % 2 == 0);
+    v.reserve(s.length() / 2);
+
+    // Convert each pair of hexadecimal digits to a byte
+    for (size_t i = 0; i < s.length(); i += 2) {
+        // Extract two characters from the string
+        char highNibble = s[i];
+        char lowNibble = s[i + 1];
+
+        // Ensure they are valid hexadecimal digits
+        assert(std::isxdigit(highNibble) && std::isxdigit(lowNibble));
+
+        // Convert hex pair to a byte
+        uint8_t byte = (std::stoi(s.substr(i, 2), nullptr, 16) & 0xFF);
+        v.push_back(byte);
+    }
+#endif
+}
+
 template<typename T>
 T reserialize(const T &obj)
 {
@@ -102,6 +152,8 @@ size_t get_serialized_size(const T& obj){
     ss << obj;
     return ss.str().size();
 }
+
+
 
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T> &v)

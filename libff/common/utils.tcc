@@ -46,6 +46,15 @@ T random_element_exclude(T y)
     return x;
 }
 
+template<typename Fp_to, typename Fp_from>
+Fp_to convert_field(Fp_from a)
+{
+    assert(Fp_to::mod == Fp_from::mod); // Poseidon Parameters must mach curve parameters
+    Fp_to b;
+    b.mont_repr = a.mont_repr;
+    return b;
+}
+
 } // namespace libff
 
 #endif // UTILS_TCC_

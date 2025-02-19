@@ -14,6 +14,7 @@
 #include <ostream>
 #include <set>
 #include <vector>
+#include <cstdint>
 
 namespace libff {
 
@@ -74,6 +75,9 @@ inline void input_bool(std::istream &in, bool &b);
 
 inline void output_bool_vector(std::ostream &out, const std::vector<bool> &v);
 inline void input_bool_vector(std::istream &in, std::vector<bool> &v);
+
+inline void output_bytes(std::ostream& out, const std::vector<uint8_t> &v);
+inline void input_bytes(std::istream& in, std::vector<uint8_t> &v);
 
 template<typename T>
 T reserialize(const T &obj);
